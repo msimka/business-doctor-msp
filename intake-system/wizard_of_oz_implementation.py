@@ -8,7 +8,7 @@ import asyncio
 from datetime import datetime
 import json
 from typing import Dict, List, Optional
-import pandas as pd
+# import pandas as pd  # Not needed for this implementation
 import plotly.graph_objects as go
 from dataclasses import dataclass, asdict
 import google.generativeai as genai
