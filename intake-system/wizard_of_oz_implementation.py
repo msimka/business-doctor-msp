@@ -11,12 +11,11 @@ from typing import Dict, List, Optional
 import pandas as pd
 import plotly.graph_objects as go
 from dataclasses import dataclass, asdict
-import openai
-from anthropic import Anthropic
+import google.generativeai as genai
 
-# Initialize AI clients
-claude = Anthropic(api_key=st.secrets["ANTHROPIC_API_KEY"])
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+# Initialize Gemini client
+genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
+gemini = genai.GenerativeModel('gemini-pro')
 
 @dataclass
 class ConversationState:
@@ -334,26 +333,19 @@ class WizardOfOzInterface:
     def _generate_ai_suggestions(self, user_message: str) -> List[str]:
         """Generate response suggestions using AI"""
         try:
-            response = claude.messages.create(
-                model="claude-3-sonnet-20240229",
-                max_tokens=1000,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": f"""As a Business Doctor AI conducting intake, suggest 3 different responses to this client message. 
-                        Make them conversational, insightful, and focused on understanding their business deeply.
-                        
-                        Client message: {user_message}
-                        
-                        Current stage: {st.session_state.conversation_state.stage}
-                        Topics covered: {st.session_state.conversation_state.topics_covered}
-                        
-                        Provide 3 different response options, separated by ---"""
-                    }
-                ]
-            )
+            prompt = f"""As a Business Doctor AI conducting intake, suggest 3 different responses to this client message. 
+            Make them conversational, insightful, and focused on understanding their business deeply.
             
-            suggestions = response.content[0].text.split("---")
+            Client message: {user_message}
+            
+            Current stage: {st.session_state.conversation_state.stage}
+            Topics covered: {st.session_state.conversation_state.topics_covered}
+            
+            Provide 3 different response options, separated by ---"""
+            
+            response = gemini.generate_content(prompt)
+            
+            suggestions = response.text.split("---")
             return [s.strip() for s in suggestions if s.strip()][:3]
             
         except Exception as e:

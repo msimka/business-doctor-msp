@@ -9,11 +9,10 @@ from typing import AsyncGenerator, List, Optional
 import time
 import random
 from dataclasses import dataclass
-import anthropic
-from anthropic import AsyncAnthropic
+import google.generativeai as genai
 
-# Initialize async Claude client
-async_claude = AsyncAnthropic(api_key=st.secrets.get("ANTHROPIC_API_KEY", ""))
+# Initialize Gemini client
+genai.configure(api_key=st.secrets.get("GOOGLE_API_KEY", ""))
 
 @dataclass
 class StreamConfig:
@@ -175,7 +174,7 @@ class ConversationOrchestrator:
         patterns = self._identify_patterns(user_input)
         
         # Generate main response
-        response = await self._call_claude(user_input)
+        response = await self._call_gemini(user_input)
         
         # Create reasoning updates with timing
         reasoning_updates = []
@@ -252,8 +251,8 @@ class ConversationOrchestrator:
             
         return patterns
     
-    async def _call_claude(self, user_input: str) -> str:
-        """Call Claude API for response generation"""
+    async def _call_gemini(self, user_input: str) -> str:
+        """Call Gemini API for response generation"""
         try:
             # Create context from conversation history
             context = "\n".join([
@@ -261,27 +260,21 @@ class ConversationOrchestrator:
                 for turn in self.conversation_state[-3:]  # Last 3 turns
             ])
             
-            response = await async_claude.messages.create(
-                model="claude-3-sonnet-20240229",
-                max_tokens=500,
-                messages=[
-                    {
-                        "role": "user",
-                        "content": f"""You are a Business Doctor AI conducting an intake interview. 
-                        Be conversational, insightful, and focused on understanding the business deeply.
-                        Ask follow-up questions to uncover bottlenecks and inefficiencies.
-                        
-                        Previous context:
-                        {context}
-                        
-                        User's current message: {user_input}
-                        
-                        Respond naturally and identify areas for improvement."""
-                    }
-                ]
-            )
+            model = genai.GenerativeModel('gemini-pro')
+            prompt = f"""You are a Business Doctor AI conducting an intake interview. 
+            Be conversational, insightful, and focused on understanding the business deeply.
+            Ask follow-up questions to uncover bottlenecks and inefficiencies.
             
-            return response.content[0].text
+            Previous context:
+            {context}
+            
+            User's current message: {user_input}
+            
+            Respond naturally and identify areas for improvement."""
+            
+            response = await model.generate_content_async(prompt)
+            
+            return response.text
             
         except Exception as e:
             # Fallback response

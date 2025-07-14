@@ -1,0 +1,9 @@
+{
+  "github_repo": "business-doctor-msp",
+  "streamlit_app": "deployment/streamlit_app.py",
+  "secrets_needed": [
+    "ANTHROPIC_API_KEY",
+    "OPENAI_API_KEY",
+    "OPERATOR_ACCESS_CODE"
+  ]
+}
