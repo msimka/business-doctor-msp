@@ -1,0 +1,213 @@
+{
+  "legal_intake_automation_flows": {
+    "1_initial_contact_handler": {
+      "name": "Legal Intake - Initial Contact Handler",
+      "description": "Responds to all incoming inquiries within 30 seconds",
+      "triggers": [
+        {
+          "type": "email_received",
+          "source": "intake@lawfirm.com"
+        },
+        {
+          "type": "phone_call",
+          "source": "main_number"
+        },
+        {
+          "type": "form_submission",
+          "source": "website_contact"
+        }
+      ],
+      "actions": [
+        {
+          "step": 1,
+          "action": "capture_contact_info",
+          "details": {
+            "fields": ["name", "email", "phone", "preferred_contact"],
+            "source": "extract_from_communication"
+          }
+        },
+        {
+          "step": 2,
+          "action": "ai_initial_response",
+          "details": {
+            "model": "gpt-4",
+            "prompt_template": "legal_intake_initial",
+            "personalization": true,
+            "response_time": "immediate"
+          }
+        },
+        {
+          "step": 3,
+          "action": "create_intake_record",
+          "details": {
+            "system": "dynamics_365",
+            "record_type": "potential_client",
+            "status": "new_inquiry"
+          }
+        },
+        {
+          "step": 4,
+          "action": "route_to_intake_questionnaire",
+          "details": {
+            "send_link": true,
+            "track_completion": true
+          }
+        }
+      ]
+    },
+    
+    "2_intelligent_questionnaire": {
+      "name": "Legal Intake - Dynamic Questionnaire",
+      "description": "Adapts questions based on case type and responses",
+      "components": {
+        "case_type_detection": {
+          "ai_model": "custom_classifier",
+          "categories": [
+            "personal_injury",
+            "family_law", 
+            "criminal_defense",
+            "business_law",
+            "estate_planning",
+            "real_estate"
+          ]
+        },
+        "dynamic_questions": {
+          "personal_injury": [
+            "When did the injury occur?",
+            "Have you received medical treatment?",
+            "Was a police report filed?",
+            "Have you spoken with insurance companies?",
+            "Are you currently represented by another attorney?"
+          ],
+          "family_law": [
+            "What type of family law matter?",
+            "Are there children involved?",
+            "Has a case been filed?",
+            "Is this an emergency situation?",
+            "What is your desired outcome?"
+          ]
+        },
+        "document_collection": {
+          "ai_extraction": true,
+          "ocr_enabled": true,
+          "auto_categorization": true
+        }
+      }
+    },
+    
+    "3_conflict_checker": {
+      "name": "Legal Intake - Automated Conflict Check",
+      "description": "Searches all matters for potential conflicts",
+      "process": [
+        {
+          "step": 1,
+          "action": "extract_party_names",
+          "method": "ai_entity_recognition"
+        },
+        {
+          "step": 2,
+          "action": "search_all_matters",
+          "scope": ["clients", "opposing_parties", "related_entities"],
+          "fuzzy_matching": true
+        },
+        {
+          "step": 3,
+          "action": "check_relationships",
+          "depth": "2_degrees",
+          "corporate_structures": true
+        },
+        {
+          "step": 4,
+          "action": "generate_conflict_report",
+          "flag_level": ["clear", "potential", "definite"],
+          "notify": ["managing_partner", "ethics_committee"]
+        }
+      ]
+    },
+    
+    "4_appointment_scheduler": {
+      "name": "Legal Intake - Smart Scheduling",
+      "description": "Books consultations based on attorney availability and expertise",
+      "logic": {
+        "attorney_matching": {
+          "criteria": ["practice_area", "availability", "workload", "seniority"],
+          "ai_recommendation": true
+        },
+        "scheduling_rules": {
+          "buffer_time": 15,
+          "prep_time": 30,
+          "conflict_avoidance": true,
+          "travel_time_consideration": true
+        },
+        "client_preferences": {
+          "time_zones": true,
+          "preferred_times": true,
+          "virtual_vs_inperson": true
+        }
+      },
+      "automation": [
+        "send_calendar_invites",
+        "create_zoom_links",
+        "send_prep_documents",
+        "set_reminders",
+        "update_crm"
+      ]
+    },
+    
+    "5_intake_analytics": {
+      "name": "Legal Intake - Performance Analytics",
+      "description": "Tracks and optimizes intake performance",
+      "metrics": {
+        "response_times": {
+          "target": "30_seconds",
+          "measure": "first_contact_to_response"
+        },
+        "conversion_rates": {
+          "stages": ["inquiry", "questionnaire", "consultation", "retained"],
+          "by_source": true,
+          "by_practice_area": true
+        },
+        "quality_scores": {
+          "completeness": "percentage_fields_captured",
+          "accuracy": "validation_checks_passed",
+          "client_satisfaction": "post_intake_survey"
+        }
+      },
+      "dashboards": {
+        "real_time": ["active_intakes", "response_times", "queue_depth"],
+        "daily": ["conversions", "by_attorney", "by_source"],
+        "monthly": ["roi_metrics", "trend_analysis", "optimization_opportunities"]
+      }
+    }
+  },
+  
+  "integration_points": {
+    "practice_management": {
+      "supported": ["Clio", "MyCase", "PracticePanther", "Smokeball"],
+      "sync_frequency": "real_time",
+      "field_mapping": "customizable"
+    },
+    "communication_platforms": {
+      "email": "Exchange_Online",
+      "phone": "Azure_Communication_Services",
+      "sms": "Twilio_via_connector",
+      "chat": "Teams_or_custom_widget"
+    },
+    "document_management": {
+      "storage": "SharePoint",
+      "organization": "matter_based_folders",
+      "retention": "policy_based"
+    },
+    "accounting": {
+      "trust_accounting": "api_integration",
+      "billing_creation": "automated_from_intake",
+      "payment_processing": "optional_addon"
+    }
+  },
+  
+  "ai_prompts": {
+    "initial_response": "You are a professional legal intake specialist. Acknowledge the inquiry warmly, confirm receipt, explain next steps, and set expectations for response time. Do not provide legal advice.",
+    "qualification": "Based on the information provided, determine if this is a viable case for our firm. Consider practice area fit, statute of limitations, conflict indicators, and economic viability.",
+    "information_gathering": "Ask clarifying questions to gather essential case information. Be empathetic but efficient. Focus on facts needed for attorney evaluation."
+  }
+}
