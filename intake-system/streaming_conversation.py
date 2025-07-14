@@ -324,4 +324,6 @@ async def main():
 
 # Run with: streamlit run streaming_conversation.py
 if __name__ == "__main__":
+    import nest_asyncio
+    nest_asyncio.apply()
     asyncio.run(main())

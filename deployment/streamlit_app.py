@@ -8,9 +8,11 @@ import sys
 import os
 
 # Add parent directory to path for imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, parent_dir)
+sys.path.insert(0, os.path.join(parent_dir, 'intake-system'))
 
-from intake_system.wizard_of_oz_implementation import WizardOfOzInterface
+from wizard_of_oz_implementation import WizardOfOzInterface
 
 # Configure page based on mode
 query_params = st.query_params

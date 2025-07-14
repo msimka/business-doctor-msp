@@ -64,11 +64,7 @@ class WizardOfOzInterface:
     
     def render_client_view(self):
         """Client-facing Glass Box interface"""
-        st.set_page_config(
-            page_title="Business Doctor AI Consultation",
-            page_icon="🏥",
-            layout="wide"
-        )
+        # Page config is already set in main app
         
         # Header
         st.title("🏥 Business Doctor AI Consultation")
@@ -173,11 +169,7 @@ class WizardOfOzInterface:
     
     def render_operator_view(self):
         """Hidden operator interface for pilot phase"""
-        st.set_page_config(
-            page_title="Operator Console - Business Doctor",
-            page_icon="🎛️",
-            layout="wide"
-        )
+        # Page config is already set in main app
         
         st.title("🎛️ Wizard of Oz Operator Console")
         
