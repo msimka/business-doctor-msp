@@ -55,9 +55,17 @@ class WizardOfOzInterface:
             
     def render(self):
         """Render appropriate interface based on URL parameter"""
-        query_params = st.query_params
+        # Handle both old and new Streamlit versions
+        try:
+            # Streamlit >= 1.28
+            query_params = st.query_params
+            mode = query_params.get("mode", "client")
+        except AttributeError:
+            # Streamlit < 1.28
+            query_params = st.experimental_get_query_params()
+            mode = query_params.get("mode", ["client"])[0] if "mode" in query_params else "client"
         
-        if query_params.get("mode") == "operator":
+        if mode == "operator":
             self.render_operator_view()
         else:
             self.render_client_view()

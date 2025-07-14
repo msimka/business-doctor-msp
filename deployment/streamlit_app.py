@@ -15,8 +15,15 @@ sys.path.insert(0, os.path.join(parent_dir, 'intake-system'))
 from wizard_of_oz_implementation import WizardOfOzInterface
 
 # Configure page based on mode
-query_params = st.query_params
-mode = query_params.get("mode", "client")
+# Handle both old and new Streamlit versions
+try:
+    # Streamlit >= 1.28
+    query_params = st.query_params
+    mode = query_params.get("mode", "client")
+except AttributeError:
+    # Streamlit < 1.28
+    query_params = st.experimental_get_query_params()
+    mode = query_params.get("mode", ["client"])[0] if "mode" in query_params else "client"
 
 if mode == "operator":
     st.set_page_config(
@@ -119,11 +126,17 @@ def main():
             st.caption("Development Tools")
             if mode == "client":
                 if st.button("🎛️ Switch to Operator View"):
-                    st.query_params["mode"] = "operator"
+                    try:
+                        st.query_params["mode"] = "operator"
+                    except AttributeError:
+                        st.experimental_set_query_params(mode="operator")
                     st.rerun()
             else:
                 if st.button("👤 Switch to Client View"):
-                    st.query_params["mode"] = "client"
+                    try:
+                        st.query_params["mode"] = "client"
+                    except AttributeError:
+                        st.experimental_set_query_params(mode="client")
                     st.rerun()
     
     # Add operator instructions
